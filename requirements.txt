@@ -1,0 +1,5 @@
+Django>=3.2,<4.0
+djangorestframework
+psycopg2-binary
+django-ckeditor
+# Add any other dependencies your project needs
