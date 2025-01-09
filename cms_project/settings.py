@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
 
-    'cms'
+    'cms',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -108,7 +109,7 @@ WSGI_APPLICATION = 'cms_project.wsgi.application'
 
 # }
 
-
+AUTH_USER_MODEL = 'cms.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
