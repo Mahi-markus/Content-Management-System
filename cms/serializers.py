@@ -3,6 +3,7 @@ from .models import User, Content, Feedback
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from .models import User, Content, Feedback
+from django.contrib.auth import authenticate
 
 
 
@@ -32,8 +33,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         role = attrs.get('role')
         managed_by = attrs.get('managed_by')
         
-        if role == User.CONTENT_WRITER and not managed_by:
-            raise serializers.ValidationError({"managed_by": "Content writers must have a managing admin."})
+        # if role == User.CONTENT_WRITER and not managed_by:
+        #     raise serializers.ValidationError({"managed_by": "Content writers must have a managing admin."})
         
         if role == User.ADMIN and managed_by:
             raise serializers.ValidationError({"managed_by": "Admin users cannot have a manager."})
@@ -72,3 +73,28 @@ class FeedbackSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = ['id', 'content', 'comment', 'manager', 'created_at']
         read_only_fields = ['manager']
+
+
+
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if user:
+                if not user.is_active:
+                    raise serializers.ValidationError("User is deactivated.")
+                data['user'] = user
+            else:
+                raise serializers.ValidationError("Unable to log in with provided credentials.")
+        else:
+            raise serializers.ValidationError("Must include 'username' and 'password'.")
+
+        return data

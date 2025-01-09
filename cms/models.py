@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+import uuid
 
 
 class User(AbstractUser):
@@ -12,7 +13,7 @@ class User(AbstractUser):
         (ADMIN, 'Admin'),
         (CONTENT_WRITER, 'Content Writer'),
     ]
-
+    token = models.CharField(max_length=500, default=str(uuid.uuid4()), blank=True ,null=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=CONTENT_WRITER)
     managed_by = models.ForeignKey(
         'self',

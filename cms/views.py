@@ -2,9 +2,19 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import APIView
 from .models import User, Content, Feedback
 from .serializers import  ContentSerializer, FeedbackSerializer
 from .serializers import UserCreateSerializer, WriterListSerializer,UserSerializer
+from django.contrib.auth import login
+from django.contrib.auth import logout
+from rest_framework.views import APIView
+from .serializers import LoginSerializer
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+# from django.contrib.auth import authenticate
+
+
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -16,7 +26,7 @@ class IsContentWriter(permissions.BasePermission):
     
 
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     
@@ -44,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['get'])
-    def me(self, request):
+    def current(self, request):
         """Get current user's information"""
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
@@ -165,3 +175,28 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(manager=self.request.user)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        login(request, user)
+        return Response({
+            'user': UserSerializer(user).data,
+            'message': 'Login successful'
+        }, status=status.HTTP_200_OK)
+    
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        return Response({
+            'message': 'Logout successful'
+        }, status=status.HTTP_200_OK)    
