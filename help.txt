@@ -4,3 +4,4 @@ docker exec -it content-management-system-web-1 python manage.py migrate
 
 docker exec -it content-management-system-web-1 python manage.py createsuperuser
 docker exec -it content-management-system-web-1 bash
+docker exec -it content-management-system-web-1 python manage.py show_urls

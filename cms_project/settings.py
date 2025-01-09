@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     'cms',
     'rest_framework',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
