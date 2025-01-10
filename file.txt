@@ -2,3 +2,17 @@
     "username": "writer2",
     "password": "Mahi1234"
 }
+
+
+
+
+[
+    {
+        "username": "writer_user",
+        "password": "writer_password",
+        "email": "writer@example.com",
+        "role": "writer",
+        "managed_by": 1  // Assuming the admin user ID is 1
+    }
+
+]

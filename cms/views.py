@@ -62,40 +62,76 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def writers(self, request):
         """Get all content writers managed by the current admin"""
-        # if not request.user.is_admin():
-        #     return Response(
-        #         {"error": "Only admin users can view writers"},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
+        if not request.user.is_admin():
+            return Response(
+                {"error": "Only admin users can view writers"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         writers = request.user.get_managed_writers()
         serializer = WriterListSerializer(writers, many=True)
         return Response(serializer.data)
+    
 
-    @action(detail=True, methods=['post'])
-    def assign_manager(self, request, pk=None):
-        """Assign a manager to a content writer"""
-        if not request.user.is_admin():
+    @action(detail=False, methods=['post'], permission_classes=[IsAdmin])
+    def assign_to_writer(self, request):
+        """Assign content to a writer"""
+        manager = request.user
+        writer_id = request.data.get('writer_id')
+        title = request.data.get('title')
+        content_text = request.data.get('content')
+
+        # Check if writer_id, title, and content are provided
+        if not writer_id or not title or not content_text:
             return Response(
-                {"error": "Only admin users can assign managers"},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        writer = self.get_object()
-        manager_id = request.data.get('manager_id')
-
-        try:
-            manager = User.objects.get(id=manager_id, role=User.ADMIN)
-        except User.DoesNotExist:
-            return Response(
-                {"error": "Invalid manager ID"},
+                {"error": "writer_id, title, and content are required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        writer.managed_by = manager
-        writer.save()
+        try:
+            writer = User.objects.get(id=writer_id, role=User.CONTENT_WRITER, managed_by=manager)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Invalid writer ID or writer is not managed by you"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        content = Content.objects.create(
+            title=title,
+            content=content_text,
+            status=Content.ASSIGNED,
+            writter=writer,
+            manager=manager
+        )
         return Response({
-            "message": f"Writer {writer.username} is now managed by {manager.username}"
-        })
+            "message": "Content created and assigned to writer",
+            "content": ContentSerializer(content).data
+        }, status=status.HTTP_201_CREATED)
+
+    # @action(detail=True, methods=['post'])
+    # def assign_writer(self, request, pk=None):
+    #     """Assign a manager to a content writer"""
+    #     if not request.user.is_admin():
+    #         return Response(
+    #             {"error": "Only admin users can assign writer"},
+    #             status=status.HTTP_403_FORBIDDEN
+    #         )
+
+    #     writer = self.get_object()
+    #     manager_id = request.data.get('manager_id')
+
+    #     try:
+    #         manager = User.objects.get(id=manager_id, role=User.ADMIN)
+    #     except User.DoesNotExist:
+    #         return Response(
+    #             {"error": "Invalid manager ID"},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+
+    #     writer.managed_by = manager
+    #     writer.save()
+    #     return Response({
+    #         "message": f"Writer {writer.username} is now managed by {manager.username}"
+    #     })
 
     @action(detail=True, methods=['post'])
     def change_role(self, request, pk=None):
@@ -143,7 +179,10 @@ class ContentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(writter=self.request.user)
 
+    
+
     @action(detail=True, methods=['post'])
+    @method_decorator(csrf_exempt, name='dispatch')
     def submit_for_review(self, request, pk=None):
         content = self.get_object()
         if content.status != Content.IN_PROGRESS:
@@ -156,6 +195,7 @@ class ContentViewSet(viewsets.ModelViewSet):
         return Response({"status": "Content submitted for review"})
 
     @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    @method_decorator(csrf_exempt, name='dispatch')
     def approve(self, request, pk=None):
         content = self.get_object()
         if content.status != Content.PENDING_REVIEW:
@@ -165,10 +205,47 @@ class ContentViewSet(viewsets.ModelViewSet):
             )
         content.approve()
         return Response({"status": "Content approved"})
+    
+
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAdmin])
+    def assign_to_writer(self, request):
+        """Assign content to a writer"""
+        manager = request.user
+        writer_id = request.data.get('writer_id')
+        title = request.data.get('title')
+        content_text = request.data.get('content')
+
+        # Check if writer_id, title, and content are provided
+        if not writer_id or not title or not content_text:
+            return Response(
+                {"error": "writer_id, title, and content are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            writer = User.objects.get(id=writer_id, role=User.CONTENT_WRITER, managed_by=manager)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Invalid writer ID or writer is not managed by you"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        content = Content.objects.create(
+            title=title,
+            content=content_text,
+            status=Content.ASSIGNED,
+            writter=writer,
+            manager=manager
+        )
+        return Response({
+            "message": "Content created and assigned to writer",
+            "content": ContentSerializer(content).data
+        }, status=status.HTTP_201_CREATED)
 
 class FeedbackViewSet(viewsets.ModelViewSet):
     serializer_class = FeedbackSerializer
-    # permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin]
 
     def get_queryset(self):
         return Feedback.objects.filter(manager=self.request.user)
@@ -200,3 +277,6 @@ class LogoutView(APIView):
         return Response({
             'message': 'Logout successful'
         }, status=status.HTTP_200_OK)    
+
+
+

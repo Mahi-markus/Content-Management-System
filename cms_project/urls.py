@@ -20,4 +20,5 @@ from django.urls import path, include  # Include the 'include' function
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('cms.urls')),  # Ensure 'cms.urls' includes your API paths
+    
 ]
