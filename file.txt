@@ -16,3 +16,48 @@
     }
 
 ]
+
+
+  {
+        "username": "new_writer",
+        "password": "mahi1234",
+        "password_confirm" :"mahi1234",
+        "email": "testuser@example.com",
+        "role": "writer"
+      }
+
+all the api's here:
+http://localhost:8000/api/users/
+
+
+http://localhost:8000/login/
+
+http://localhost:8000/logout/
+
+http://localhost:8000/api/users/writers/
+
+http://localhost:8000/api/contents/
+
+
+http://localhost:8000/api/feedbacks/
+
+
+http://localhost:8000/api/users/current/
+
+
+http://localhost:8000/api/contents/1/
+
+http://localhost:8000/api/contents/1/submit_for_review/
+
+http://localhost:8000/api/contents/assign_to_writer/
+
+
+http://localhost:8000/api/contents/1/approve/
+
+http://localhost:8000/api/contents/assign_to_writer/
+
+
+http://localhost:8000/api/contents/assign_to_writer/
+
+
+http://localhost:8000/api/users/1/change_role/
