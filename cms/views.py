@@ -203,6 +203,11 @@ class ContentViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def set_in_progress(self, request, pk=None):
         """Set the status of content to In Progress"""
+        if not request.user.is_content_writer():
+            return Response(
+                {"error": "Only content writers can change roles"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         content = self.get_object()
 
         # Check if the content status is not already in progress

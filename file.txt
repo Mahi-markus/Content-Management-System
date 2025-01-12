@@ -6,25 +6,50 @@
 
 
 
-[
+
+{
+    "username": "manager",
+    "password": "mahi1234"
+}
+
+
+
+{
+    "username": "manager",
+    "email": "admin@example.com",
+    "password": "mahi1234",
+    "password_confirm": "mahi1234",
+    "role": "admin"
+}
+
+
     {
-        "username": "writer_user",
-        "password": "writer_password",
-        "email": "writer@example.com",
-        "role": "writer",
-        "managed_by": 1  // Assuming the admin user ID is 1
-    }
-
-]
-
-
-  {
         "username": "new_writer",
         "password": "mahi1234",
         "password_confirm" :"mahi1234",
         "email": "testuser@example.com",
         "role": "writer"
       }
+
+
+
+ {
+  "content": 3,                  
+  "comment": "not Great"
+}
+
+
+{
+    "writer_id": 2,
+    "title": "Test Article",
+    "content": "This is a test article."
+}
+
+
+
+
+
+
 
 all the api's here:
 http://localhost:8000/api/users/

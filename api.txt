@@ -1,0 +1,34 @@
+http://localhost:8000/api/users/    -post   -createsuperuser
+
+http://localhost:8000/login/         -post   -login
+
+http://localhost:8000/logout/        -post   -logout
+
+
+http://localhost:8000/api/users/writers/     -get   get All writers(for admin)
+
+http://localhost:8000/api/contents/          -get    get all contents
+
+http://localhost:8000/api/feedbacks/         -post   post feedback to a content
+
+http://localhost:8000/api/users/current/      -get   get current username
+
+
+http://localhost:8000/api/contents/3/         -get   get id wise content
+
+
+http://localhost:8000/api/contents/3/submit_for_review/     -post   To submit for review (writer only)
+
+
+http://localhost:8000/api/contents/3/approve/       -post      To approve content (admin only)
+
+
+http://localhost:8000/api/users/assign_to_writer/   -post      To assign a content to a writer
+
+
+http://localhost:8000/api/users/unassigned_writers/   -get     To see all unassigned_writers
+
+
+http://localhost:8000/api/contents/3/set_in_progress/  -post   To set status to "in progress"
+
+
