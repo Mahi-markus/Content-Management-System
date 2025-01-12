@@ -3,5 +3,6 @@ djangorestframework
 psycopg2-binary
 django-ckeditor
 django_extensions
+djangorestframework-simplejwt
 # djangorestframework-simplejwt
 # Add any other dependencies your project needs

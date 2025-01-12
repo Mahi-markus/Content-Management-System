@@ -36,7 +36,7 @@ http://localhost:8000/logout/
 
 http://localhost:8000/api/users/writers/
 
-http://localhost:8000/api/contents/
+http://localhost:8000/api/users/assign_to_writer/       ----  to assign_to_writer
 
 
 http://localhost:8000/api/feedbacks/
